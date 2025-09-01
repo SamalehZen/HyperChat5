@@ -99,6 +99,7 @@ Huile 1L | 20 | 1,50 | 0
 • Vérifier les colonnes avant calcul
 • Ignorer lignes incomplètes ou erronées
 • Normaliser nombres et gérer devises
+• Toutes les valeurs de la colonne "Qté UC", si un nombre est écrit avec une virgule (ex: "6,000"), il faut ignorer la partie décimale ou la considérer comme nulle, et prendre le nombre entier avant la virgule (donc "6" pour "6,000").
 
 #### 4. Exemple simplifié
 | Code Article | Désignation      | Qté UC | Prix Achat UC | Prix Revient UC | Prix de Vente | Marge %    | Marge Numérique |
