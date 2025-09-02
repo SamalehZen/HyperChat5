@@ -3,7 +3,7 @@
  * This file only imports client-safe OCR dependencies
  */
 
-import { ClientQuotaTracker } from '@repo/ai/ocr/client';
+import { ClientQuotaTracker } from '@repo/ai/ocr';
 
 /**
  * Get OCR quota status for UI display (client-safe)
