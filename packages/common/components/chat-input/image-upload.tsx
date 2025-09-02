@@ -57,6 +57,6 @@ export const FileUpload: FC<TFileUpload> = ({
 };
 
 // Backward compatibility wrapper
-export const ImageUpload: FC<TImageUpload> = (props) => {
-    return <FileUpload {...props} />;
+export const ImageUpload: FC<TImageUpload> = ({ handleImageUpload, ...props }) => {
+    return <FileUpload {...props} handleFileUpload={handleImageUpload} />;
 };
