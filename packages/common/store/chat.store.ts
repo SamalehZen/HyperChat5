@@ -67,7 +67,7 @@ type State = {
     editor: any;
     chatMode: ChatMode;
     context: string;
-    imageAttachment: { base64?: string; file?: File };
+    fileAttachments: Array<{ id: string; base64?: string; file?: File; name: string; type: string; size: number }>;
     abortController: AbortController | null;
     threads: Thread[];
     threadItems: ThreadItem[];
@@ -93,8 +93,9 @@ type Actions = {
     setEditor: (editor: any) => void;
     setContext: (context: string) => void;
     fetchRemainingCredits: () => Promise<void>;
-    setImageAttachment: (imageAttachment: { base64?: string; file?: File }) => void;
-    clearImageAttachment: () => void;
+    addFileAttachment: (fileAttachment: { id: string; base64?: string; file?: File; name: string; type: string; size: number }) => void;
+    removeFileAttachment: (id: string) => void;
+    clearFileAttachments: () => void;
     setIsGenerating: (isGenerating: boolean) => void;
     stopGeneration: () => void;
     setAbortController: (abortController: AbortController) => void;
@@ -447,7 +448,7 @@ export const useChatStore = create(
         activeThreadItemView: null,
         currentThread: null,
         currentThreadItem: null,
-        imageAttachment: { base64: undefined, file: undefined },
+        fileAttachments: [],
         messageGroups: [],
         abortController: null,
         isLoadingThreads: false,
@@ -473,15 +474,27 @@ export const useChatStore = create(
             });
         },
 
-        setImageAttachment: (imageAttachment: { base64?: string; file?: File }) => {
+        addFileAttachment: (fileAttachment: { id: string; base64?: string; file?: File; name: string; type: string; size: number }) => {
             set(state => {
-                state.imageAttachment = imageAttachment;
+                // Check if file already exists (avoid duplicates)
+                const existingIndex = state.fileAttachments.findIndex(f => f.id === fileAttachment.id);
+                if (existingIndex >= 0) {
+                    state.fileAttachments[existingIndex] = fileAttachment;
+                } else {
+                    state.fileAttachments.push(fileAttachment);
+                }
             });
         },
 
-        clearImageAttachment: () => {
+        removeFileAttachment: (id: string) => {
             set(state => {
-                state.imageAttachment = { base64: undefined, file: undefined };
+                state.fileAttachments = state.fileAttachments.filter(f => f.id !== id);
+            });
+        },
+
+        clearFileAttachments: () => {
+            set(state => {
+                state.fileAttachments = [];
             });
         },
 

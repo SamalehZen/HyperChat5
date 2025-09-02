@@ -1,5 +1,6 @@
 'use client';
 export * from './chat-input';
+export { FileAttachments } from './chat-input/image-attachment';
 export * from './code-block/code-block';
 export * from './command-search';
 export * from './error-boundary';

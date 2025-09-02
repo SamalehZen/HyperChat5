@@ -1,11 +1,11 @@
 'use client';
 import { useAuth } from '@clerk/nextjs';
 import {
-    ImageAttachment,
     ImageDropzoneRoot,
     MessagesRemainingBadge,
 } from '@repo/common/components';
-import { useImageAttachment } from '@repo/common/hooks';
+import { FileAttachments } from './image-attachment';
+import { useFileAttachment } from '@repo/common/hooks';
 import { ChatModeConfig } from '@repo/shared/config';
 import { cn, Flex } from '@repo/ui';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -57,11 +57,11 @@ export const ChatInput = ({
     const useWebSearch = useChatStore(state => state.useWebSearch);
     const isGenerating = useChatStore(state => state.isGenerating);
     const isChatPage = usePathname().startsWith('/chat');
-    const imageAttachment = useChatStore(state => state.imageAttachment);
-    const clearImageAttachment = useChatStore(state => state.clearImageAttachment);
+    const fileAttachments = useChatStore(state => state.fileAttachments);
+    const clearFileAttachments = useChatStore(state => state.clearFileAttachments);
     const stopGeneration = useChatStore(state => state.stopGeneration);
     const hasTextInput = !!editor?.getText();
-    const { dropzonProps, handleImageUpload } = useImageAttachment();
+    const { dropzonProps, handleFileUpload } = useFileAttachment();
     const { push } = useRouter();
     const chatMode = useChatStore(state => state.chatMode);
     const sendMessage = async () => {
@@ -91,7 +91,16 @@ export const ChatInput = ({
         // First submit the message
         const formData = new FormData();
         formData.append('query', editor.getText());
-        imageAttachment?.base64 && formData.append('imageAttachment', imageAttachment?.base64);
+        
+        // Add all file attachments
+        fileAttachments.forEach((attachment, index) => {
+            if (attachment.base64) {
+                formData.append(`fileAttachment_${index}`, attachment.base64);
+                formData.append(`fileName_${index}`, attachment.name);
+                formData.append(`fileType_${index}`, attachment.type);
+            }
+        });
+        formData.append('attachmentCount', fileAttachments.length.toString());
         const threadItems = currentThreadId ? await getThreadItems(currentThreadId.toString()) : [];
 
         console.log('threadItems', threadItems);
@@ -106,7 +115,7 @@ export const ChatInput = ({
         });
         window.localStorage.removeItem('draft-message');
         editor.commands.clearContent();
-        clearImageAttachment();
+        clearFileAttachments();
     };
 
     const renderChatInput = () => (
@@ -138,7 +147,7 @@ export const ChatInput = ({
                                     transition={{ duration: 0.15, ease: 'easeOut' }}
                                     className="w-full"
                                 >
-                                    <ImageAttachment />
+                                    <FileAttachments />
                                     <Flex className="flex w-full flex-row items-end gap-0">
                                         <ChatEditor
                                             sendMessage={sendMessage}
@@ -162,11 +171,11 @@ export const ChatInput = ({
                                                 <WebSearchButton />
                                                 {/* <ToolsMenu /> */}
                                                 <ImageUpload
-                                                    id="image-attachment"
-                                                    label="Image"
-                                                    tooltip="Image Attachment"
+                                                    id="file-attachment"
+                                                    label="Files"
+                                                    tooltip="File Attachment (Images, PDF)"
                                                     showIcon={true}
-                                                    handleImageUpload={handleImageUpload}
+                                                    handleImageUpload={handleFileUpload}
                                                 />
                                             </Flex>
                                         )}

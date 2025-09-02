@@ -2,6 +2,7 @@ import { useChatStore } from '@repo/common/store';
 import { useToast } from '@repo/ui';
 import { ChangeEvent, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { nanoid } from 'nanoid';
 // const resizeFile = (file: File) =>
 //   new Promise((resolve) => {
 //     Resizer.imageFileResizer(
@@ -18,77 +19,121 @@ import { useDropzone } from 'react-dropzone';
 //     );
 //   });
 
-export type TRenderImageUpload = {
+export type TRenderFileUpload = {
     showIcon?: boolean;
     label?: string;
     tooltip?: string;
 };
 
-export const useImageAttachment = () => {
-    const imageAttachment = useChatStore(state => state.imageAttachment);
-    const setImageAttachment = useChatStore(state => state.setImageAttachment);
-    const clearImageAttachment = useChatStore(state => state.clearImageAttachment);
+// Backward compatibility
+export type TRenderImageUpload = TRenderFileUpload;
+
+export const useFileAttachment = () => {
+    const fileAttachments = useChatStore(state => state.fileAttachments);
+    const addFileAttachment = useChatStore(state => state.addFileAttachment);
+    const removeFileAttachment = useChatStore(state => state.removeFileAttachment);
+    const clearFileAttachments = useChatStore(state => state.clearFileAttachments);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        const file = acceptedFiles?.[0];
-        readImageFile(file);
+        acceptedFiles.forEach(file => readFileAttachment(file));
     }, []);
-    const dropzonProps = useDropzone({ onDrop, multiple: false, noClick: true });
+    const dropzonProps = useDropzone({ 
+        onDrop, 
+        multiple: true, 
+        noClick: true,
+        accept: {
+            'image/jpeg': ['.jpg', '.jpeg'],
+            'image/png': ['.png'],
+            'image/gif': ['.gif'],
+            'application/pdf': ['.pdf']
+        }
+    });
     const { toast } = useToast();
 
-    const clearAttachment = () => {
-        clearImageAttachment();
+    const clearAttachments = () => {
+        clearFileAttachments();
     };
 
-    const readImageFile = async (file?: File) => {
-        const reader = new FileReader();
+    const removeAttachment = (id: string) => {
+        removeFileAttachment(id);
+    };
 
-        const fileTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (file && !fileTypes.includes(file?.type)) {
+    const readFileAttachment = async (file?: File) => {
+        if (!file) return;
+
+        const fileTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+        if (!fileTypes.includes(file.type)) {
             toast({
                 title: 'Invalid format',
-                description: 'Please select a valid image (JPEG, PNG, GIF).',
+                description: 'Please select a valid file (JPEG, PNG, GIF, PDF).',
                 variant: 'destructive',
             });
             return;
         }
 
-        const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
-        if (file && file.size > MAX_FILE_SIZE) {
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes (increased for PDF support)
+        if (file.size > MAX_FILE_SIZE) {
             toast({
                 title: 'File too large',
-                description: 'Image size should be less than 3MB.',
+                description: 'File size should be less than 10MB.',
                 variant: 'destructive',
             });
             return;
         }
+
+        // Check if file already exists
+        const existingFile = fileAttachments.find(f => f.name === file.name && f.size === file.size);
+        if (existingFile) {
+            toast({
+                title: 'File already attached',
+                description: `${file.name} is already in your attachments.`,
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        const fileId = nanoid();
 
         reader.onload = () => {
             if (typeof reader.result !== 'string') return;
-            const base64String = reader?.result?.split(',')[1];
-            setImageAttachment({
-                base64: `data:${file?.type};base64,${base64String}`,
+            const base64String = reader.result;
+            
+            addFileAttachment({
+                id: fileId,
+                base64: base64String,
+                file,
+                name: file.name,
+                type: file.type,
+                size: file.size,
             });
         };
 
-        if (file) {
-            setImageAttachment({
-                file,
-            });
-            // const resizedFile = await resizeFile(file);
-
-            reader.readAsDataURL(file);
-        }
+        reader.readAsDataURL(file);
     };
 
-    const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        readImageFile(file);
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        files.forEach(file => readFileAttachment(file));
+        // Reset the input so the same file can be selected again
+        e.target.value = '';
     };
 
     return {
         dropzonProps,
-        handleImageUpload,
-        clearAttachment,
+        handleFileUpload,
+        clearAttachments,
+        removeAttachment,
+        fileAttachments,
+    };
+};
+
+// Backward compatibility wrapper
+export const useImageAttachment = () => {
+    const result = useFileAttachment();
+    return {
+        dropzonProps: result.dropzonProps,
+        handleImageUpload: result.handleFileUpload,
+        clearAttachment: result.clearAttachments,
     };
 };

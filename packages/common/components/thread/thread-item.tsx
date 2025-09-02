@@ -77,7 +77,7 @@ export const ThreadItem = memo(
                         {threadItem.query && (
                             <Message
                                 message={threadItem.query}
-                                imageAttachment={threadItem?.imageAttachment}
+                                fileAttachments={threadItem?.fileAttachments}
                                 threadItem={threadItem}
                             />
                         )}

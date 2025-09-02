@@ -4,6 +4,15 @@ import { Button, Tooltip } from '@repo/ui';
 import { IconPaperclip } from '@tabler/icons-react';
 import { FC } from 'react';
 
+export type TFileUpload = {
+    id: string;
+    label: string;
+    tooltip: string;
+    showIcon: boolean;
+    handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+// Backward compatibility
 export type TImageUpload = {
     id: string;
     label: string;
@@ -12,12 +21,12 @@ export type TImageUpload = {
     handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export const ImageUpload: FC<TImageUpload> = ({
+export const FileUpload: FC<TFileUpload> = ({
     id,
     label,
     tooltip,
     showIcon,
-    handleImageUpload,
+    handleFileUpload,
 }) => {
     const chatMode = useChatStore(state => state.chatMode);
     const handleFileSelect = () => {
@@ -30,7 +39,14 @@ export const ImageUpload: FC<TImageUpload> = ({
 
     return (
         <>
-            <input type="file" id={id} className="hidden" onChange={handleImageUpload} />
+            <input 
+                type="file" 
+                id={id} 
+                className="hidden" 
+                onChange={handleFileUpload}
+                multiple
+                accept="image/jpeg,image/png,image/gif,application/pdf"
+            />
             <Tooltip content={tooltip}>
                 {showIcon ? (
                     <Button variant="ghost" size="icon-sm" onClick={handleFileSelect}>
@@ -44,4 +60,9 @@ export const ImageUpload: FC<TImageUpload> = ({
             </Tooltip>
         </>
     );
+};
+
+// Backward compatibility wrapper
+export const ImageUpload: FC<TImageUpload> = ({ handleImageUpload, ...props }) => {
+    return <FileUpload {...props} handleFileUpload={handleImageUpload} />;
 };
