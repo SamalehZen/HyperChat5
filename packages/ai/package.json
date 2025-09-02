@@ -11,7 +11,8 @@
         "./models": "./models.ts",
         "./tools": "./tools/index.ts",
         "./workflow": "./workflow/flow.ts",
-        "./worker": "./worker/index.ts"
+        "./worker": "./worker/index.ts",
+        "./ocr": "./ocr/index.ts"
     },
     "dependencies": {
         "@ai-sdk/anthropic": "^1.1.8",
@@ -20,6 +21,7 @@
         "@ai-sdk/openai": "^1.1.11",
         "@ai-sdk/togetherai": "^0.1.11",
         "@anthropic-ai/sdk": "^0.36.3",
+        "@google-cloud/vision": "^5.3.3",
         "@modelcontextprotocol/sdk": "^1.6.1",
         "@repo/orchestrator": "*",
         "@repo/shared": "*",
@@ -31,6 +33,9 @@
         "json-schema-to-zod": "^2.6.0",
         "langfuse": "^3.36.0",
         "openai": "^4.24.1",
+        "pdf-poppler": "^0.2.1",
+        "sharp": "^0.34.3",
+        "tesseract.js": "^6.0.1",
         "together-ai": "^0.13.0",
         "uuid": "^11.0.5",
         "zod": "^3.23.8",
