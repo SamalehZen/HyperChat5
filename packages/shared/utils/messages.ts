@@ -1,4 +1,5 @@
 import { ThreadItem } from '@repo/shared/types';
+import { buildContentWithOCR, type ProcessedAttachment } from './ocr-utils';
 
 export const buildCoreMessagesFromThreadItems = ({
     messages,
@@ -7,7 +8,7 @@ export const buildCoreMessagesFromThreadItems = ({
 }: {
     messages: ThreadItem[];
     query: string;
-    fileAttachments?: Array<{ id: string; name: string; type: string; data: string }>;
+    fileAttachments?: Array<ProcessedAttachment>;
 }) => {
     const coreMessages = [
         ...(messages || []).flatMap(item => [
@@ -16,11 +17,7 @@ export const buildCoreMessagesFromThreadItems = ({
                 content: item.fileAttachments?.length
                     ? [
                           { type: 'text' as const, text: item.query || '' },
-                          ...item.fileAttachments.map(attachment => 
-                              attachment.type.startsWith('image/')
-                                  ? { type: 'image' as const, image: attachment.data }
-                                  : { type: 'text' as const, text: `[PDF: ${attachment.name}]\n${attachment.data}` }
-                          ),
+                          ...item.fileAttachments.map(attachment => buildContentWithOCR(attachment)),
                       ]
                     : item.query || '',
             },
@@ -34,11 +31,7 @@ export const buildCoreMessagesFromThreadItems = ({
             content: fileAttachments?.length
                 ? [
                       { type: 'text' as const, text: query || '' },
-                      ...fileAttachments.map(attachment => 
-                          attachment.type.startsWith('image/')
-                              ? { type: 'image' as const, image: attachment.data }
-                              : { type: 'text' as const, text: `[PDF: ${attachment.name}]\n${attachment.data}` }
-                      ),
+                      ...fileAttachments.map(attachment => buildContentWithOCR(attachment)),
                   ]
                 : query || '',
         },

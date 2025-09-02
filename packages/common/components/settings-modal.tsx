@@ -2,7 +2,7 @@
 import { useMcpToolsStore } from '@repo/common/store';
 import { Alert, AlertDescription, DialogFooter } from '@repo/ui';
 import { Button } from '@repo/ui/src/components/button';
-import { IconBolt, IconBoltFilled, IconKey, IconSettings2, IconTrash } from '@tabler/icons-react';
+import { IconBolt, IconBoltFilled, IconKey, IconSettings2, IconTrash, IconScan } from '@tabler/icons-react';
 
 import { Badge, Dialog, DialogContent, Input } from '@repo/ui';
 
@@ -14,6 +14,7 @@ import { SETTING_TABS, useAppStore } from '../store/app.store';
 import { useChatStore } from '../store/chat.store';
 import { ChatEditor } from './chat-input';
 import { BYOKIcon, ToolIcon } from './icons';
+import { OCRSettings } from './ocr-settings';
 
 export const SettingsModal = () => {
     const isSettingOpen = useAppStore(state => state.isSettingsOpen);
@@ -39,6 +40,12 @@ export const SettingsModal = () => {
             title: 'Clés API',
             key: SETTING_TABS.API_KEYS,
             component: <ApiKeySettings />,
+        },
+        {
+            icon: <IconScan size={16} strokeWidth={2} className="text-muted-foreground" />,
+            title: 'OCR',
+            key: SETTING_TABS.OCR_SETTINGS,
+            component: <OCRSettings />,
         },
         // {
         //     title: 'MCP Tools',

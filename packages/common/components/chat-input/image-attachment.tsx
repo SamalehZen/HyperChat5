@@ -2,6 +2,7 @@ import { useChatStore } from '@repo/common/store';
 import { Button, Flex } from '@repo/ui';
 import { FileText, X } from 'lucide-react';
 import Image from 'next/image';
+import { OCRStatusBadge } from '../ocr-status-badge';
 
 export const FileAttachments = () => {
     const attachments = useChatStore(state => state.fileAttachments);
@@ -35,8 +36,23 @@ export const FileAttachments = () => {
                             />
                         </div>
                     ) : attachment.type === 'application/pdf' ? (
-                        <div className="relative h-[40px] w-[40px] rounded-lg flex items-center justify-center bg-red-50 dark:bg-red-900/20">
-                            <FileText size={20} className="text-red-600 dark:text-red-400" />
+                        <div className="relative h-[40px] w-[120px] rounded-lg flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-2">
+                            <FileText size={20} className="text-red-600 dark:text-red-400 flex-shrink-0" />
+                            <div className="flex flex-col items-start min-w-0">
+                                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[60px]">
+                                    PDF
+                                </span>
+                                {/* Show OCR status if available */}
+                                {(attachment as any).ocrMethod && (
+                                    <OCRStatusBadge
+                                        method={(attachment as any).ocrMethod}
+                                        confidence={(attachment as any).ocrConfidence}
+                                        isProcessing={(attachment as any).isProcessing}
+                                        error={(attachment as any).ocrError}
+                                        className="text-xs h-4 px-1"
+                                    />
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <div className="relative h-[40px] w-[40px] rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-900/20">

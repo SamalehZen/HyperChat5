@@ -30,3 +30,6 @@ export * from './table-of-messages';
 export * from './text-shimmer';
 export * from './thread';
 export * from './tools-menu';
+export * from './ocr-status-badge';
+export * from './ocr-quota-display';
+export * from './ocr-settings';

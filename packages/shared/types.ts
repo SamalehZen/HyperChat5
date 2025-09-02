@@ -38,6 +38,18 @@ export type Source = {
     snippet?: string;
 };
 
+export type FileAttachment = {
+    id: string;
+    name: string;
+    type: string;
+    data: string;
+    extractedText?: string;
+    ocrMethod?: 'google-vision' | 'tesseract';
+    ocrConfidence?: number;
+    ocrError?: string;
+    isProcessing?: boolean;
+};
+
 export type Answer = {
     text: string;
     finalText?: string;
@@ -78,7 +90,7 @@ export type ThreadItem = {
     persistToDB?: boolean;
     sources?: Source[];
     object?: Record<string, any>;
-    fileAttachments?: Array<{ id: string; name: string; type: string; data: string }>;
+    fileAttachments?: FileAttachment[];
 };
 
 export type MessageGroup = {

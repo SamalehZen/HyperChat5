@@ -24,15 +24,19 @@
         "packages/*"
     ],
     "dependencies": {
+        "@google-cloud/vision": "^5.3.3",
         "@mozilla/readability": "^0.6.0",
         "@typescript-eslint/eslint-plugin": "^8.25.0",
         "@vercel/functions": "^2.0.0",
         "ai": "^2.2.0",
         "date-fns": "^4.1.0",
         "node-html-parser": "^7.0.1",
+        "pdf-poppler": "^0.2.1",
         "react-intersection-observer": "^9.16.0",
         "remark-slug": "^8.0.0",
+        "sharp": "^0.34.3",
         "supports-color": "^10.2.0",
+        "tesseract.js": "^6.0.1",
         "turndown": "^7.2.0"
     }
 }

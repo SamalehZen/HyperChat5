@@ -3,6 +3,7 @@ import { useWorkflowWorker } from '@repo/ai/worker';
 import { ChatMode, ChatModeConfig } from '@repo/shared/config';
 import { ThreadItem } from '@repo/shared/types';
 import { buildCoreMessagesFromThreadItems, plausible } from '@repo/shared/utils';
+import { processFileAttachmentsWithOCR, type ProcessedAttachment } from '@repo/shared/utils';
 import { nanoid } from 'nanoid';
 import { useParams, useRouter } from 'next/navigation';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
@@ -374,7 +375,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
             
             // Extract file attachments
             const attachmentCount = parseInt(formData.get('attachmentCount') as string) || 0;
-            const fileAttachments: Array<{ id: string; name: string; type: string; data: string }> = [];
+            const rawFileAttachments: Array<{ id: string; name: string; type: string; data: string }> = [];
             
             for (let i = 0; i < attachmentCount; i++) {
                 const fileData = formData.get(`fileAttachment_${i}`) as string;
@@ -382,7 +383,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
                 const fileType = formData.get(`fileType_${i}`) as string;
                 
                 if (fileData && fileName && fileType) {
-                    fileAttachments.push({
+                    rawFileAttachments.push({
                         id: `${Date.now()}-${i}`,
                         name: fileName,
                         type: fileType,
@@ -390,6 +391,9 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
                     });
                 }
             }
+
+            // Process file attachments with OCR for PDFs
+            const fileAttachments: ProcessedAttachment[] = await processFileAttachmentsWithOCR(rawFileAttachments);
 
             const aiThreadItem: ThreadItem = {
                 id: optimisticAiThreadItemId,
