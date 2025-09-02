@@ -13,7 +13,13 @@ export type TFileUpload = {
 };
 
 // Backward compatibility
-export type TImageUpload = TFileUpload;
+export type TImageUpload = {
+    id: string;
+    label: string;
+    tooltip: string;
+    showIcon: boolean;
+    handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
 export const FileUpload: FC<TFileUpload> = ({
     id,
