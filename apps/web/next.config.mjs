@@ -16,7 +16,24 @@ const nextConfig = {
     webpack: (config, options) => {
         if (!options.isServer) {
             config.resolve.fallback = { fs: false, module: false, path: false };
+            
+            // Add externals for gRPC dependencies to prevent client-side bundling
+            config.externals = config.externals || [];
+            config.externals.push({
+                '@google-cloud/vision': 'commonjs @google-cloud/vision',
+                '@grpc/grpc-js': 'commonjs @grpc/grpc-js',
+                'google-gax': 'commonjs google-gax',
+                'tesseract.js': 'commonjs tesseract.js',
+                // Prevent Node.js modules from being bundled for client
+                'tls': 'commonjs tls',
+                'net': 'commonjs net',
+                'http2': 'commonjs http2',
+                'fs': 'commonjs fs',
+                'path': 'commonjs path',
+                'child_process': 'commonjs child_process',
+            });
         }
+        
         // Experimental features
         config.experiments = {
             ...config.experiments,

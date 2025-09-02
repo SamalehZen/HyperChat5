@@ -9,6 +9,7 @@
         "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
     },
     "devDependencies": {
+        "@types/pdf-parse": "^1.1.5",
         "@typescript-eslint/parser": "^8.25.0",
         "eslint": "^9.21.0",
         "eslint-plugin-prettier": "^5.2.3",

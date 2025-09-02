@@ -60,10 +60,11 @@ graph TD
 
 ## 🎯 **Usage Examples**
 
-### **Basic Usage**
+### **Server-Side Usage (API Routes)**
 
 ```typescript
-import { getOCRManager } from '@repo/ai/ocr';
+// Use server-only import in API routes
+import { getOCRManager } from '@repo/ai/ocr/server';
 
 const ocrManager = getOCRManager();
 const result = await ocrManager.processDocument(pdfFile);
@@ -71,6 +72,23 @@ const result = await ocrManager.processDocument(pdfFile);
 console.log(`Text: ${result.text}`);
 console.log(`Method: ${result.method}`); // 'google-vision' or 'tesseract'
 console.log(`Source: ${result.confidence === 100 ? 'Direct extraction' : 'OCR'}`);
+```
+
+### **Client-Side Usage (React Components)**
+
+```typescript
+// Client-side: Use API routes instead of direct imports
+const processFile = async (file: File) => {
+    const response = await fetch('/api/ocr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: [{ ...fileData }] }),
+        credentials: 'include',
+    });
+    
+    const result = await response.json();
+    return result.results[0];
+};
 ```
 
 ### **Debug Different Strategies**

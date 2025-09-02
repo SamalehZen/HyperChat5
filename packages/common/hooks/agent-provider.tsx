@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useWorkflowWorker } from '@repo/ai/worker';
-import { getOCRManager } from '@repo/ai/ocr';
+// Removed direct OCR import to prevent client-side bundling issues
 import { ChatMode, ChatModeConfig } from '@repo/shared/config';
 import { ThreadItem } from '@repo/shared/types';
 import { buildCoreMessagesFromThreadItems, plausible } from '@repo/shared/utils';
@@ -25,7 +25,7 @@ export type AgentContextType = {
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
-// Process file attachments with OCR for PDF files
+// Process file attachments with OCR for PDF files using API route
 const processFileAttachmentsWithOCR = async (
     fileAttachments: Array<{ id: string; name: string; type: string; data: string }>,
     chatMode: ChatMode
@@ -42,51 +42,92 @@ const processFileAttachmentsWithOCR = async (
     }
 
     const processedAttachments = [];
+    const filesToProcess: Array<{ id: string; name: string; type: string; base64: string; size: number }> = [];
 
+    // Separate PDF files that need OCR processing
     for (const attachment of fileAttachments) {
         if (attachment.type === 'application/pdf') {
-            try {
-                console.log(`Processing PDF with OCR: ${attachment.name}`);
-                
-                const ocrManager = getOCRManager();
-                
-                // Convert to OCR-compatible format
-                const fileForOCR = {
-                    id: attachment.id,
-                    name: attachment.name,
-                    type: attachment.type,
-                    base64: attachment.data,
-                    size: 0, // We don't have size info here, but it's already validated
-                };
-
-                const ocrResult = await ocrManager.processDocument(fileForOCR);
-                
-                if (ocrResult.text && !ocrResult.error) {
-                    // Replace PDF data with extracted text
-                    processedAttachments.push({
-                        ...attachment,
-                        data: `[PDF: ${attachment.name} - Processed with ${ocrResult.method.toUpperCase()} (${ocrResult.confidence}% confidence)]\n\n${ocrResult.text}`,
-                    });
-                    
-                    console.log(`OCR successful: ${attachment.name} | Method: ${ocrResult.method} | Confidence: ${ocrResult.confidence}%`);
-                } else {
-                    // Keep original if OCR fails
-                    console.warn(`OCR failed for ${attachment.name}: ${ocrResult.error}`);
-                    processedAttachments.push({
-                        ...attachment,
-                        data: `[PDF: ${attachment.name} - OCR failed: ${ocrResult.error || 'Unknown error'}]\n\nOriginal PDF data preserved but may not be readable by AI.`,
-                    });
-                }
-            } catch (error) {
-                console.error(`Error processing PDF ${attachment.name}:`, error);
-                processedAttachments.push({
-                    ...attachment,
-                    data: `[PDF: ${attachment.name} - Processing error: ${error instanceof Error ? error.message : 'Unknown error'}]`,
-                });
-            }
+            filesToProcess.push({
+                id: attachment.id,
+                name: attachment.name,
+                type: attachment.type,
+                base64: attachment.data,
+                size: 0, // We don't have size info here, but it's already validated
+            });
         } else {
             // Keep non-PDF files as-is
             processedAttachments.push(attachment);
+        }
+    }
+
+    // Process PDF files with OCR via API if any
+    if (filesToProcess.length > 0) {
+        try {
+            console.log(`Processing ${filesToProcess.length} PDF files with OCR via API`);
+            
+            const response = await fetch('/api/ocr', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    files: filesToProcess,
+                }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('OCR API failed:', errorText);
+                
+                // Fall back to original attachments if API fails
+                for (const file of filesToProcess) {
+                    const originalAttachment = fileAttachments.find(att => att.id === file.id);
+                    if (originalAttachment) {
+                        processedAttachments.push({
+                            ...originalAttachment,
+                            data: `[PDF: ${file.name} - OCR API failed: ${errorText}]\n\nOriginal PDF data preserved but may not be readable by AI.`,
+                        });
+                    }
+                }
+            } else {
+                const ocrResponse = await response.json();
+                
+                for (const result of ocrResponse.results) {
+                    const originalAttachment = fileAttachments.find(att => att.id === result.id);
+                    if (!originalAttachment) continue;
+
+                    if (result.success && result.text) {
+                        // Replace PDF data with extracted text
+                        processedAttachments.push({
+                            ...originalAttachment,
+                            data: `[PDF: ${result.name} - Processed with ${result.method.toUpperCase()} (${result.confidence}% confidence)]\n\n${result.text}`,
+                        });
+                        
+                        console.log(`OCR successful: ${result.name} | Method: ${result.method} | Confidence: ${result.confidence}%`);
+                    } else {
+                        // Keep original if OCR fails
+                        console.warn(`OCR failed for ${result.name}: ${result.error}`);
+                        processedAttachments.push({
+                            ...originalAttachment,
+                            data: `[PDF: ${result.name} - OCR failed: ${result.error || 'Unknown error'}]\n\nOriginal PDF data preserved but may not be readable by AI.`,
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error calling OCR API:', error);
+            
+            // Fall back to original attachments if API call fails
+            for (const file of filesToProcess) {
+                const originalAttachment = fileAttachments.find(att => att.id === file.id);
+                if (originalAttachment) {
+                    processedAttachments.push({
+                        ...originalAttachment,
+                        data: `[PDF: ${file.name} - OCR API error: ${error instanceof Error ? error.message : 'Unknown error'}]`,
+                    });
+                }
+            }
         }
     }
 

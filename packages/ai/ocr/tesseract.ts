@@ -1,6 +1,6 @@
 import { createWorker } from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
-import * as pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 import sharp from 'sharp';
 import { OCRResult, FileAttachment } from './types';
 import { PDFJSConfig } from './config';

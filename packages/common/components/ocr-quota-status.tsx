@@ -17,17 +17,28 @@ export const OCRQuotaStatus = () => {
     const loadQuotaInfo = async () => {
         setIsLoading(true);
         try {
-            // This would call your OCR manager in a real implementation
-            // For now, simulate the quota check
-            const mockQuota: QuotaInfo = {
-                used: 750,
-                remaining: 250,
-                limit: 1000,
-                resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
-            };
-            setQuotaInfo(mockQuota);
+            const response = await fetch('/api/ocr', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            
+            if (response.ok) {
+                const quotaData = await response.json();
+                const quotaInfo: QuotaInfo = {
+                    used: quotaData.used || 0,
+                    remaining: quotaData.remaining || 0,
+                    limit: quotaData.limit || 1000,
+                    resetDate: new Date(quotaData.resetDate || new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)),
+                };
+                setQuotaInfo(quotaInfo);
+            } else {
+                console.error('Failed to fetch quota info:', await response.text());
+                // Fall back to showing unavailable status
+                setQuotaInfo(null);
+            }
         } catch (error) {
             console.error('Failed to load quota info:', error);
+            setQuotaInfo(null);
         }
         setIsLoading(false);
     };

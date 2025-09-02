@@ -2,7 +2,7 @@ import { ImageAnnotatorClient } from '@google-cloud/vision';
 import { OCRResult, FileAttachment } from './types';
 
 export class GoogleVisionService {
-    private client: ImageAnnotatorClient;
+    private client: ImageAnnotatorClient | undefined;
     private enabled: boolean;
 
     constructor() {
@@ -24,7 +24,7 @@ export class GoogleVisionService {
         const startTime = Date.now();
 
         try {
-            if (!this.enabled) {
+            if (!this.enabled || !this.client) {
                 throw new Error('Google Vision API not configured');
             }
 
@@ -63,7 +63,7 @@ export class GoogleVisionService {
         const startTime = Date.now();
 
         try {
-            if (!this.enabled) {
+            if (!this.enabled || !this.client) {
                 throw new Error('Google Vision API not configured');
             }
 
@@ -111,7 +111,7 @@ export class GoogleVisionService {
 
     async testConnection(): Promise<boolean> {
         try {
-            if (!this.enabled) return false;
+            if (!this.enabled || !this.client) return false;
             
             // Simple test with minimal image
             const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
