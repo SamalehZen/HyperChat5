@@ -6,14 +6,14 @@ import { Button, cn } from '@repo/ui';
 import { IconCheck, IconCopy, IconPencil } from '@tabler/icons-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { ImageMessage } from './image-message';
+import { FileMessage } from './image-message';
 type MessageProps = {
     message: string;
-    imageAttachment?: string;
+    fileAttachments?: Array<{ id: string; name: string; type: string; data: string }>;
     threadItem: ThreadItem;
 };
 
-export const Message = memo(({ message, imageAttachment, threadItem }: MessageProps) => {
+export const Message = memo(({ message, fileAttachments, threadItem }: MessageProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const messageRef = useRef<HTMLDivElement>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +37,7 @@ export const Message = memo(({ message, imageAttachment, threadItem }: MessagePr
 
     return (
         <div className="flex w-full flex-col items-end gap-2 pt-4">
-            {imageAttachment && <ImageMessage imageAttachment={imageAttachment} />}
+            {fileAttachments && fileAttachments.length > 0 && <FileMessage fileAttachments={fileAttachments} />}
             <div
                 className={cn(
                     'text-foreground bg-tertiary group relative max-w-[80%] overflow-hidden rounded-lg',
@@ -147,7 +147,15 @@ export const EditMessage = memo(({ message, onCancel, threadItem, width }: TEdit
 
         const formData = new FormData();
         formData.append('query', query);
-        formData.append('imageAttachment', threadItem.imageAttachment || '');
+        
+        // Add file attachments if they exist
+        const attachments = threadItem.fileAttachments || [];
+        attachments.forEach((attachment, index) => {
+            formData.append(`fileAttachment_${index}`, attachment.data);
+            formData.append(`fileName_${index}`, attachment.name);
+            formData.append(`fileType_${index}`, attachment.type);
+        });
+        formData.append('attachmentCount', attachments.length.toString());
         const threadItems = await getThreadItems(threadItem.threadId);
 
         handleSubmit({

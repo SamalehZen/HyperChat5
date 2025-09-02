@@ -371,7 +371,25 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
 
             const optimisticAiThreadItemId = existingThreadItemId || nanoid();
             const query = formData.get('query') as string;
-            const imageAttachment = formData.get('imageAttachment') as string;
+            
+            // Extract file attachments
+            const attachmentCount = parseInt(formData.get('attachmentCount') as string) || 0;
+            const fileAttachments: Array<{ id: string; name: string; type: string; data: string }> = [];
+            
+            for (let i = 0; i < attachmentCount; i++) {
+                const fileData = formData.get(`fileAttachment_${i}`) as string;
+                const fileName = formData.get(`fileName_${i}`) as string;
+                const fileType = formData.get(`fileType_${i}`) as string;
+                
+                if (fileData && fileName && fileType) {
+                    fileAttachments.push({
+                        id: `${Date.now()}-${i}`,
+                        name: fileName,
+                        type: fileType,
+                        data: fileData,
+                    });
+                }
+            }
 
             const aiThreadItem: ThreadItem = {
                 id: optimisticAiThreadItemId,
@@ -380,7 +398,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
                 status: 'QUEUED',
                 threadId,
                 query,
-                imageAttachment,
+                fileAttachments: fileAttachments.length > 0 ? fileAttachments : undefined,
                 mode,
             };
 
@@ -399,7 +417,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
             const coreMessages = buildCoreMessagesFromThreadItems({
                 messages: messages || [],
                 query,
-                imageAttachment,
+                fileAttachments,
             });
 
             if (hasApiKeyForChatMode(mode)) {
