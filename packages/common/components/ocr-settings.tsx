@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Flex, Input, Switch, Text, Button } from '@repo/ui';
 import { OCRQuotaDisplay } from './ocr-quota-display';
+import { ClientQuotaTracker, hasGoogleVisionApiKey } from '@repo/ai/ocr/client';
 
 interface OCRSettings {
     googleVisionEnabled: boolean;
@@ -32,9 +33,7 @@ export const OCRSettings: React.FC = () => {
         }
 
         // Check if Google Vision API key is configured
-        const apiKey = process.env.GOOGLE_VISION_API_KEY || 
-                      localStorage.getItem('google-vision-api-key');
-        setHasApiKey(!!apiKey && apiKey.length > 0);
+        setHasApiKey(hasGoogleVisionApiKey());
     }, []);
 
     const saveSettings = (newSettings: Partial<OCRSettings>) => {
@@ -46,9 +45,7 @@ export const OCRSettings: React.FC = () => {
     const handleResetQuota = async () => {
         if (confirm('Êtes-vous sûr de vouloir réinitialiser le quota OCR ?')) {
             try {
-                // Import QuotaTracker dynamically to avoid SSR issues
-                const { QuotaTracker } = await import('@repo/ai/ocr');
-                const tracker = new QuotaTracker(settings.monthlyQuota);
+                const tracker = new ClientQuotaTracker(settings.monthlyQuota);
                 await tracker.resetQuota();
                 
                 // Trigger a refresh of quota display

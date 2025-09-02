@@ -15,7 +15,23 @@ const nextConfig = {
     },
     webpack: (config, options) => {
         if (!options.isServer) {
-            config.resolve.fallback = { fs: false, module: false, path: false };
+            config.resolve.fallback = { 
+                fs: false, 
+                module: false, 
+                path: false,
+                tls: false,
+                net: false,
+                http2: false,
+                crypto: false,
+                stream: false,
+                url: false,
+                zlib: false,
+                http: false,
+                https: false,
+                assert: false,
+                os: false,
+                util: false
+            };
         }
         // Experimental features
         config.experiments = {

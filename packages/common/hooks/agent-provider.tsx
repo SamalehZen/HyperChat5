@@ -3,7 +3,7 @@ import { useWorkflowWorker } from '@repo/ai/worker';
 import { ChatMode, ChatModeConfig } from '@repo/shared/config';
 import { ThreadItem } from '@repo/shared/types';
 import { buildCoreMessagesFromThreadItems, plausible } from '@repo/shared/utils';
-import { processFileAttachmentsWithOCR, type ProcessedAttachment } from '@repo/shared/utils';
+import { processFileAttachmentsWithOCR, type ProcessedAttachment } from '@repo/shared/utils/ocr-client-processing';
 import { nanoid } from 'nanoid';
 import { useParams, useRouter } from 'next/navigation';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
