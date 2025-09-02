@@ -92,7 +92,6 @@ export const AIInputWrapper = React.forwardRef<HTMLDivElement, AIInputWrapperPro
     const setUseWebSearch = useChatStore(state => state.setUseWebSearch);
     const createThread = useChatStore(state => state.createThread);
     const getThreadItems = useChatStore(state => state.getThreadItems);
-    const getCurrentThreadItem = useChatStore(state => state.getCurrentThreadItem);
     const showSuggestions = useChatStore(state => state.showSuggestions);
 
     // Agent stream hook
@@ -228,17 +227,6 @@ export const AIInputWrapper = React.forwardRef<HTMLDivElement, AIInputWrapperPro
       setUseWebSearch(enabled);
     }, [setUseWebSearch]);
 
-    // Handle suggestion click
-    const handleSuggestionClick = useCallback((suggestion: string) => {
-      handlePromptSubmit(suggestion, selectedModelId, uiFileAttachments);
-    }, [handlePromptSubmit, selectedModelId, uiFileAttachments]);
-
-    // Get suggestions from the last thread item (if any)
-    const suggestions: string[] = useMemo(() => {
-      const currentThreadItem = getCurrentThreadItem();
-      return currentThreadItem?.suggestions || [];
-    }, [getCurrentThreadItem, threadItems]);
-
     const isChatPage = pathname.startsWith('/chat');
 
     return (
@@ -261,14 +249,12 @@ export const AIInputWrapper = React.forwardRef<HTMLDivElement, AIInputWrapperPro
             onModelChange={handleModelChange}
             onFileUpload={handleFileUploadWrapper}
             onWebSearchToggle={handleWebSearchToggle}
-            onSuggestionClick={handleSuggestionClick}
             placeholder={isFollowUp ? 'Demander un suivi' : 'Demandez n\'importe quoi'}
             disabled={false}
             isGenerating={isGenerating}
             selectedModel={selectedModelId}
             fileAttachments={uiFileAttachments}
             webSearchEnabled={useWebSearch}
-            suggestions={suggestions}
             models={aiModels}
             className="w-full"
           />
