@@ -6,8 +6,6 @@
         "./config": "./config/index.ts",
         "./db": "./db/index.ts",
         "./utils": "./utils/index.ts",
-        "./utils/ocr-client-utils": "./utils/ocr-client-utils.ts",
-        "./utils/ocr-client-processing": "./utils/ocr-client-processing.ts",
         "./types": "./types.ts",
         "./logger": "./logger.ts",
         "./posthog": "./posthog.ts"

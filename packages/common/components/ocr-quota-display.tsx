@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Card, Flex, Text } from '@repo/ui';
-import { getOCRQuotaStatus } from '@repo/shared/utils';
+import { getOCRQuotaStatus } from '@repo/shared/utils/ocr-client';
 
 interface QuotaStatus {
     percentage: number;

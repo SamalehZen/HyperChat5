@@ -1,6 +1,6 @@
 /**
- * Client-safe OCR utilities and quota tracking
- * This file contains only browser-compatible code and types
+ * Client-safe OCR utilities - NO server-side dependencies
+ * This file contains only browser-compatible code
  */
 
 export interface QuotaUsage {
@@ -18,7 +18,7 @@ export interface UsageRecord {
 
 /**
  * Client-side quota tracker using localStorage
- * This is safe to use in React components
+ * Safe to use in React components
  */
 export class ClientQuotaTracker {
     private readonly STORAGE_KEY = 'ocr-quota-usage';
@@ -170,4 +170,40 @@ export function hasGoogleVisionApiKey(): boolean {
     
     const apiKey = localStorage.getItem('google-vision-api-key');
     return !!apiKey && apiKey.length > 0;
+}
+
+/**
+ * Get OCR quota status for UI display (client-safe)
+ */
+export async function getOCRQuotaStatus() {
+    try {
+        // Use client-safe quota tracker
+        const tracker = new ClientQuotaTracker();
+        return await tracker.getQuotaStatus();
+    } catch (error) {
+        console.error('Failed to get OCR quota status:', error);
+        return {
+            percentage: 0,
+            status: 'green' as const,
+            message: 'Statut du quota indisponible',
+        };
+    }
+}
+
+/**
+ * Get current OCR quota usage
+ */
+export async function getOCRQuotaUsage() {
+    try {
+        const tracker = new ClientQuotaTracker();
+        return await tracker.getCurrentUsage();
+    } catch (error) {
+        console.error('Failed to get OCR quota usage:', error);
+        return {
+            used: 0,
+            remaining: 1000,
+            month: new Date().toISOString().slice(0, 7),
+            resetDate: new Date(),
+        };
+    }
 }

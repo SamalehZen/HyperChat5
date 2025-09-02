@@ -12,8 +12,7 @@
         "./tools": "./tools/index.ts",
         "./workflow": "./workflow/flow.ts",
         "./worker": "./worker/index.ts",
-        "./ocr": "./ocr/index.ts",
-        "./ocr/client": "./ocr/client.ts"
+        "./ocr": "./ocr/index.ts"
     },
     "dependencies": {
         "@ai-sdk/anthropic": "^1.1.8",

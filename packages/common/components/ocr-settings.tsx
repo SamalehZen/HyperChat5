@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Flex, Input, Switch, Text, Button } from '@repo/ui';
 import { OCRQuotaDisplay } from './ocr-quota-display';
-import { ClientQuotaTracker, hasGoogleVisionApiKey } from '@repo/ai/ocr';
+import { ClientQuotaTracker, hasGoogleVisionApiKey } from '@repo/shared/utils/ocr-client';
 
 interface OCRSettings {
     googleVisionEnabled: boolean;
