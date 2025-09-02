@@ -1,4 +1,5 @@
 export * from './types';
+export * from './config';
 export * from './google-vision';
 export * from './tesseract';
 export * from './quota-tracker';
