@@ -1,17 +1,18 @@
 'use client';
 
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
-// Optimized imports - only import needed icons to reduce bundle size
-import { ArrowRight } from 'lucide-react/dist/esm/icons/arrow-right';
-import { Bot } from 'lucide-react/dist/esm/icons/bot';
-import { Brain } from 'lucide-react/dist/esm/icons/brain';
-import { Cpu } from 'lucide-react/dist/esm/icons/cpu';
-import { Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
-import { Zap } from 'lucide-react/dist/esm/icons/zap';
-import { Paperclip } from 'lucide-react/dist/esm/icons/paperclip';
-import { Globe } from 'lucide-react/dist/esm/icons/globe';
-import { ChevronDown } from 'lucide-react/dist/esm/icons/chevron-down';
-import { Check } from 'lucide-react/dist/esm/icons/check';
+import {
+  ArrowRight,
+  Bot,
+  Brain,
+  Cpu,
+  Zap,
+  Sparkles,
+  Paperclip,
+  ChevronDown,
+  Check,
+  Globe,
+} from 'lucide-react';
 import * as React from 'react';
 import { useState, useRef, useEffect, useCallback, useMemo, useDeferredValue, startTransition, Suspense } from 'react';
 import { LucideProps } from 'lucide-react';

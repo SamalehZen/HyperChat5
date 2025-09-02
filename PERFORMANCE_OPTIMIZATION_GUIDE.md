@@ -24,17 +24,31 @@ Ce document détaille toutes les optimisations de performance appliquées au com
 ### 1. Bundle Size Optimization
 
 ```typescript
-// ❌ Avant - Import massif
-import { ArrowRight, Bot, Brain /* ... */ } from 'lucide-react';
+// ❌ Avant - Import avec potentiel tree-shaking sous-optimal
+import { 
+  ArrowRight, Bot, Brain, Cpu, Sparkles, Zap,
+  Paperclip, Globe, ChevronDown, /* ... beaucoup d'autres icônes non utilisées */
+} from 'lucide-react';
 
-// ✅ Après - Imports sélectifs
-import { ArrowRight } from 'lucide-react/dist/esm/icons/arrow-right';
-import { Bot } from 'lucide-react/dist/esm/icons/bot';
+// ✅ Après - Imports optimisés (Lucide gère le tree-shaking automatiquement)
+import {
+  ArrowRight,
+  Bot,
+  Brain,
+  Cpu,
+  Zap,
+  Sparkles,
+  Paperclip,
+  ChevronDown,
+  Check,
+  Globe,
+} from 'lucide-react';
 ```
 
 **Avantages** :
-- Réduction de 64% de la taille du bundle
-- Tree shaking optimal
+- Tree shaking automatique par Lucide React
+- Bundle optimisé sans imports manuels complexes
+- Meilleure compatibilité avec les bundlers modernes
 - Temps de chargement réduit
 
 ### 2. Memoization Avancée

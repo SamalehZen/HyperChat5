@@ -29,12 +29,22 @@
 ### Réalité des Optimisations Bundle :
 
 ```typescript
-// ❌ Import massif (avant) - Bundle: ~180KB
-import { ArrowRight, Bot, Brain, /* ... */ } from 'lucide-react';
+// ❌ Import potentiellement non optimisé (avant)
+import { ArrowRight, Bot, Brain, /* + beaucoup d'autres icônes non utilisées */ } from 'lucide-react';
 
-// ✅ Imports sélectifs (après) - Bundle: ~65KB
-import { ArrowRight } from 'lucide-react/dist/esm/icons/arrow-right';
-import { Bot } from 'lucide-react/dist/esm/icons/bot';
+// ✅ Imports optimisés (après) - Lucide gère le tree-shaking automatiquement
+import {
+  ArrowRight,
+  Bot,
+  Brain,
+  Cpu,
+  Zap,
+  Sparkles,
+  Paperclip,
+  ChevronDown,
+  Check,
+  Globe,
+} from 'lucide-react';
 ```
 
 **Économies réelles estimées** :
