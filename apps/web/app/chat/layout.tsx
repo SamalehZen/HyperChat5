@@ -1,4 +1,4 @@
-import { ChatInput } from '@repo/common/components';
+import { AIInputWrapper } from '@repo/common/components';
 
 export default function ChatPageLayout({
     children,
@@ -10,7 +10,7 @@ export default function ChatPageLayout({
     return (
         <div className="relative flex h-full w-full flex-col">
             {children}
-            <ChatInput />
+            <AIInputWrapper />
         </div>
     );
 }

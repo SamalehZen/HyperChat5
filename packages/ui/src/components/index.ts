@@ -36,3 +36,5 @@ export * from './use-confirm-popover';
 export * from './use-toast';
 
 export * from './input-otp';
+export * from './animated-ai-input';
+export { AI_Prompt, type AIModel, type FileAttachment } from './animated-ai-input';
