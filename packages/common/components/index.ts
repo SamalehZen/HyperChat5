@@ -1,5 +1,6 @@
 'use client';
-export * from './chat-input';
+// Legacy chat-input components (kept for backward compatibility with settings)
+export { ChatEditor } from './chat-input/chat-editor';
 export { FileAttachments } from './chat-input/image-attachment';
 export * from './code-block/code-block';
 export * from './command-search';
@@ -30,3 +31,4 @@ export * from './table-of-messages';
 export * from './text-shimmer';
 export * from './thread';
 export * from './tools-menu';
+export * from './ai-input-wrapper';
