@@ -55,8 +55,6 @@ export interface AIPromptProps {
   selectedModel?: string;
   fileAttachments?: FileAttachment[];
   webSearchEnabled?: boolean;
-  suggestions?: string[];
-  onSuggestionClick?: (suggestion: string) => void;
   className?: string;
   models?: AIModel[];
 }
@@ -184,12 +182,6 @@ const animationVariants = {
     exit: { opacity: 0, height: 0 },
     transition: { duration: 0.2, ease: 'easeOut' }
   },
-  suggestion: {
-    initial: { opacity: 0, y: 4 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -4 },
-    transition: { duration: 0.15, ease: 'easeOut' }
-  },
   modelSelector: {
     initial: { opacity: 0, y: -2 },
     animate: { opacity: 1, y: 0 },
@@ -229,55 +221,6 @@ const FileAttachmentsDisplay = React.memo<{
 });
 
 FileAttachmentsDisplay.displayName = 'FileAttachmentsDisplay';
-
-// Optimized Suggestions Display with staggered animations
-const SuggestionsDisplay = React.memo<{
-  suggestions: readonly string[];
-  isGenerating: boolean;
-  onSuggestionClick?: (suggestion: string) => void;
-}>(({ suggestions, isGenerating, onSuggestionClick }) => {
-  if (suggestions.length === 0 || isGenerating) return null;
-
-  const handleSuggestionClick = useCallback(
-    (suggestion: string) => {
-      startTransition(() => {
-        onSuggestionClick?.(suggestion);
-      });
-    },
-    [onSuggestionClick]
-  );
-
-  return (
-    <motion.div
-      {...animationVariants.suggestion}
-      className="mt-4 space-y-2"
-      layoutId="suggestions-container"
-    >
-      <p className="text-sm text-muted-foreground px-1">Suggestions:</p>
-      <div className="flex flex-wrap gap-2">
-        {suggestions.map((suggestion, index) => (
-          <motion.button
-            key={`${suggestion}-${index}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: Math.min(index * 0.03, 0.2) }} // Limit max delay
-            onClick={() => handleSuggestionClick(suggestion)}
-            className={cn(
-              "px-3 py-2 text-sm bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10",
-              "rounded-lg transition-colors duration-150 text-left",
-              "hover:shadow-sm border border-transparent hover:border-border"
-            )}
-            style={{ willChange: 'background-color, border-color' }}
-          >
-            {suggestion}
-          </motion.button>
-        ))}
-      </div>
-    </motion.div>
-  );
-});
-
-SuggestionsDisplay.displayName = 'SuggestionsDisplay';
 
 // Lazy-loaded Model Selector for better performance
 const ModelSelector = React.memo<{
@@ -374,8 +317,6 @@ export const AI_Prompt = React.memo(React.forwardRef<HTMLTextAreaElement, AIProm
     selectedModel = 'gemini-2.5-flash',
     fileAttachments = [],
     webSearchEnabled = false,
-    suggestions = [],
-    onSuggestionClick,
     className,
     models = defaultModels,
     ...props
@@ -659,17 +600,6 @@ export const AI_Prompt = React.memo(React.forwardRef<HTMLTextAreaElement, AIProm
               </AnimatePresence>
             </div>
           </form>
-
-          {/* Optimized Suggestions */}
-          <AnimatePresence>
-            {suggestions.length > 0 && (
-              <SuggestionsDisplay
-                suggestions={suggestions}
-                isGenerating={isGenerating}
-                onSuggestionClick={onSuggestionClick}
-              />
-            )}
-          </AnimatePresence>
         </div>
       </MotionConfig>
     );
