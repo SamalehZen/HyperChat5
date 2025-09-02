@@ -1,7 +1,8 @@
 'use client';
 // Legacy chat-input components (kept for backward compatibility with settings)
 export { ChatEditor } from './chat-input/chat-editor';
-export { FileAttachments } from './chat-input/image-attachment';
+// Export all chat-input components (needed for ImageDropzoneRoot, ChatModeOptions, etc.)
+export * from './chat-input';
 export * from './code-block/code-block';
 export * from './command-search';
 export * from './error-boundary';

@@ -235,8 +235,8 @@ const initializeWorker = () => {
     if (typeof window === 'undefined') return;
 
     try {
-        // Create a shared worker
-        dbWorker = new SharedWorker(new URL('./db-sync.worker.ts', import.meta?.url), {
+        // Create a shared worker (Next.js compatible approach)
+        dbWorker = new SharedWorker('/db-sync.worker.js', {
             type: 'module',
         });
 
