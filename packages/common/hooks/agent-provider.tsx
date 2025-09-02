@@ -1,5 +1,6 @@
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useWorkflowWorker } from '@repo/ai/worker';
+import { getOCRManager } from '@repo/ai/ocr';
 import { ChatMode, ChatModeConfig } from '@repo/shared/config';
 import { ThreadItem } from '@repo/shared/types';
 import { buildCoreMessagesFromThreadItems, plausible } from '@repo/shared/utils';
@@ -23,6 +24,74 @@ export type AgentContextType = {
 };
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
+
+// Process file attachments with OCR for PDF files
+const processFileAttachmentsWithOCR = async (
+    fileAttachments: Array<{ id: string; name: string; type: string; data: string }>,
+    chatMode: ChatMode
+): Promise<Array<{ id: string; name: string; type: string; data: string }>> => {
+    // Only process PDFs with OCR for specific modes that benefit from it
+    const ocrEnabledModes = [
+        ChatMode.SMART_PDF_TO_EXCEL,
+        ChatMode.REVISION_DE_PRIX,
+        // Add other modes that need OCR
+    ];
+
+    if (!ocrEnabledModes.includes(chatMode)) {
+        return fileAttachments;
+    }
+
+    const processedAttachments = [];
+
+    for (const attachment of fileAttachments) {
+        if (attachment.type === 'application/pdf') {
+            try {
+                console.log(`Processing PDF with OCR: ${attachment.name}`);
+                
+                const ocrManager = getOCRManager();
+                
+                // Convert to OCR-compatible format
+                const fileForOCR = {
+                    id: attachment.id,
+                    name: attachment.name,
+                    type: attachment.type,
+                    base64: attachment.data,
+                    size: 0, // We don't have size info here, but it's already validated
+                };
+
+                const ocrResult = await ocrManager.processDocument(fileForOCR);
+                
+                if (ocrResult.text && !ocrResult.error) {
+                    // Replace PDF data with extracted text
+                    processedAttachments.push({
+                        ...attachment,
+                        data: `[PDF: ${attachment.name} - Processed with ${ocrResult.method.toUpperCase()} (${ocrResult.confidence}% confidence)]\n\n${ocrResult.text}`,
+                    });
+                    
+                    console.log(`OCR successful: ${attachment.name} | Method: ${ocrResult.method} | Confidence: ${ocrResult.confidence}%`);
+                } else {
+                    // Keep original if OCR fails
+                    console.warn(`OCR failed for ${attachment.name}: ${ocrResult.error}`);
+                    processedAttachments.push({
+                        ...attachment,
+                        data: `[PDF: ${attachment.name} - OCR failed: ${ocrResult.error || 'Unknown error'}]\n\nOriginal PDF data preserved but may not be readable by AI.`,
+                    });
+                }
+            } catch (error) {
+                console.error(`Error processing PDF ${attachment.name}:`, error);
+                processedAttachments.push({
+                    ...attachment,
+                    data: `[PDF: ${attachment.name} - Processing error: ${error instanceof Error ? error.message : 'Unknown error'}]`,
+                });
+            }
+        } else {
+            // Keep non-PDF files as-is
+            processedAttachments.push(attachment);
+        }
+    }
+
+    return processedAttachments;
+};
 
 export const AgentProvider = ({ children }: { children: ReactNode }) => {
     const { threadId: currentThreadId } = useParams();
@@ -391,6 +460,9 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
                 }
             }
 
+            // Process PDF files with OCR if needed
+            const processedAttachments = await processFileAttachmentsWithOCR(fileAttachments, mode);
+
             const aiThreadItem: ThreadItem = {
                 id: optimisticAiThreadItemId,
                 createdAt: new Date(),
@@ -398,7 +470,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
                 status: 'QUEUED',
                 threadId,
                 query,
-                fileAttachments: fileAttachments.length > 0 ? fileAttachments : undefined,
+                fileAttachments: processedAttachments.length > 0 ? processedAttachments : undefined,
                 mode,
             };
 
@@ -417,7 +489,7 @@ export const AgentProvider = ({ children }: { children: ReactNode }) => {
             const coreMessages = buildCoreMessagesFromThreadItems({
                 messages: messages || [],
                 query,
-                fileAttachments,
+                fileAttachments: processedAttachments,
             });
 
             if (hasApiKeyForChatMode(mode)) {
