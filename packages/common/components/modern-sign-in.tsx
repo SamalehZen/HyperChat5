@@ -1,3 +1,5 @@
+'use client';
+
 import { useSignIn, useSignUp } from '@clerk/nextjs';
 import { isClerkAPIResponseError } from '@clerk/nextjs/errors';
 import { SignInPage } from '@repo/ui';
