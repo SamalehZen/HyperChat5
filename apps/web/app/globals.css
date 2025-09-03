@@ -153,6 +153,40 @@ html.dark .shiki span {
         scrollbar-width: none;
         /* Firefox */
     }
+
+    /* Spotlight wrapper styles */
+    .spotlight-wrapper {
+        --hue: 30;
+        --spotlight-size: 250px;
+        --mouse-x: 50%;
+        --mouse-y: 50%;
+    }
+
+    .spotlight-wrapper .spotlight-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: inherit;
+        padding: 2px;
+        background: radial-gradient(
+            var(--spotlight-size) circle at var(--mouse-x) var(--mouse-y),
+            hsl(var(--hue) 100% 50% / 0.6),
+            transparent 70%
+        );
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: xor;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .spotlight-wrapper:hover .spotlight-overlay {
+        opacity: 1;
+    }
 }
 
 mark.prompt-highlight {
