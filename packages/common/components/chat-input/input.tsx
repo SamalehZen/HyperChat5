@@ -7,7 +7,7 @@ import {
 import { FileAttachments } from './image-attachment';
 import { useFileAttachment } from '@repo/common/hooks';
 import { ChatModeConfig } from '@repo/shared/config';
-import { cn, Flex } from '@repo/ui';
+import { cn, Flex, SpotlightWrapper } from '@repo/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
@@ -127,12 +127,17 @@ export const ChatInput = ({
                 key={`chat-input`}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-                <Flex
-                    direction="col"
-                    className={cn(
-                        'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border'
-                    )}
+                <SpotlightWrapper
+                    spotlightColor="rgba(255, 165, 0, 0.6)"
+                    spotlightSize={250}
+                    className="group"
                 >
+                    <Flex
+                        direction="col"
+                        className={cn(
+                            'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border transition-colors duration-300 group-hover:border-orange-500/20'
+                        )}
+                    >
                     <ImageDropzoneRoot dropzoneProps={dropzonProps}>
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -204,7 +209,8 @@ export const ChatInput = ({
                             )}
                         </motion.div>
                     </ImageDropzoneRoot>
-                </Flex>
+                    </Flex>
+                </SpotlightWrapper>
             </motion.div>
             <MessagesRemainingBadge key="remaining-messages" />
         </AnimatePresence>

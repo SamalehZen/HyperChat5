@@ -12,6 +12,15 @@
     }
 }
 
+@keyframes spotlight-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @layer base {
     :root {
         --vaul-overlay-background: 255, 255, 255;
@@ -152,6 +161,16 @@ html.dark .shiki span {
         /* IE and Edge */
         scrollbar-width: none;
         /* Firefox */
+    }
+
+    /* Spotlight animations */
+    .spotlight-rotate {
+        animation: spotlight-rotate 3s linear infinite;
+    }
+
+    /* Gradient conic utilities */
+    .bg-gradient-conic {
+        background: conic-gradient(var(--tw-gradient-stops));
     }
 }
 
