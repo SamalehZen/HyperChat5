@@ -130,7 +130,12 @@ export const ChatInput = ({
                 <Flex
                     direction="col"
                     className={cn(
-                        'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border'
+                        'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border',
+                        // Anneau épais autour du composant
+                        'shadow-[0_0_0_4px_rgba(59,130,246,0.5)]',
+                        'hover:shadow-[0_0_0_4px_rgba(59,130,246,0.7)]',
+                        'focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.8)]',
+                        'transition-shadow duration-200 ease-in-out'
                     )}
                 >
                     <ImageDropzoneRoot dropzoneProps={dropzonProps}>
