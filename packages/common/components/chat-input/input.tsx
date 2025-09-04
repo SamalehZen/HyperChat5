@@ -131,8 +131,8 @@ export const ChatInput = ({
                     direction="col"
                     className={cn(
                         'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border',
-                        // Anneau gris foncé permanent 4px avec outline (méthode qui fonctionne)
-                        'outline outline-4 outline-gray-500 outline-offset-0',
+                        // Anneau gris clair permanent 4px pour différencier du blanc
+                        'outline outline-4 outline-gray-300 outline-offset-0',
                         'transition-all duration-200 ease-in-out'
                     )}
                 >
