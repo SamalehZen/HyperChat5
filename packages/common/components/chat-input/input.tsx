@@ -131,15 +131,10 @@ export const ChatInput = ({
                     direction="col"
                     className={cn(
                         'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border',
-                        // Test avec outline au lieu de box-shadow
-                        'outline-4 outline-orange-500 outline outline-offset-2',
+                        // Anneau gris foncé permanent 4px avec outline (méthode qui fonctionne)
+                        'outline outline-4 outline-gray-500 outline-offset-0',
                         'transition-all duration-200 ease-in-out'
                     )}
-                    style={{
-                        // CSS inline pour forcer l'affichage si Tailwind ne fonctionne pas
-                        boxShadow: '0 0 0 6px rgba(249, 115, 22, 0.8)',
-                        border: '2px solid orange'
-                    }}
                 >
                     <ImageDropzoneRoot dropzoneProps={dropzonProps}>
                         <motion.div
