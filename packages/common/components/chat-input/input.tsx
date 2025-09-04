@@ -131,9 +131,11 @@ export const ChatInput = ({
                     direction="col"
                     className={cn(
                         'bg-background border-hard/50 shadow-subtle-sm relative z-10 w-full rounded-xl border',
-                        // Anneau épais permanent blanc/gris autour du composant (10px)
-                        'shadow-[0_0_0_10px_rgba(229,231,235,0.8)]',
-                        'transition-shadow duration-200 ease-in-out'
+                        // Anneau épais permanent très visible pour test (10px rouge)
+                        'shadow-[0_0_0_10px_rgba(239,68,68,0.6)]',
+                        // Alternative avec outline si shadow ne fonctionne pas
+                        'outline outline-[10px] outline-red-400 outline-offset-0',
+                        'transition-all duration-200 ease-in-out'
                     )}
                 >
                     <ImageDropzoneRoot dropzoneProps={dropzonProps}>
